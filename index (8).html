@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ábrelo cuando…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg1:#fff1f4; --bg2:#ffc6d6; --ink:#4a0f2a; --soft:#8e4560;
+  --rose:#d63a68; --gold:#a8663f; --line:rgba(74,15,42,.18); --btn-ink:#fff; --glass:rgba(255,255,255,.55);
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg1:#2a0a1b; --bg2:#5c1433; --ink:#ffeef3; --soft:#f2bace;
+    --rose:#ff7fa5; --gold:#f4c6a2; --line:rgba(255,238,243,.22); --btn-ink:#2a0a1b; --glass:rgba(255,255,255,.07);
+  }
+}
+:root[data-theme="dark"]{
+  --bg1:#2a0a1b; --bg2:#5c1433; --ink:#ffeef3; --soft:#f2bace;
+  --rose:#ff7fa5; --gold:#f4c6a2; --line:rgba(255,238,243,.22); --btn-ink:#2a0a1b; --glass:rgba(255,255,255,.07);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;
+  background:var(--bg1) radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg1) 70%) fixed;overflow-x:hidden;
+}
+body.lock{overflow:hidden}
+h1,h2{font-family:var(--serif);font-weight:500;line-height:1.12;margin:0}
+.wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:64px 24px 90px;text-align:center}
+.pulse{font-size:40px;line-height:1;color:var(--rose);display:inline-block;animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.1)}}
+h1{font-size:clamp(46px,14vw,74px);font-style:italic;margin:14px 0 14px;color:var(--rose);background:linear-gradient(100deg,var(--ink) 0%,var(--rose) 30%,var(--gold) 50%,var(--rose) 70%,var(--ink) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.lead{font-family:var(--serif);font-size:clamp(19px,5vw,23px);color:var(--soft);margin:0 0 44px}
+.row{
+  display:flex;width:100%;align-items:center;justify-content:center;gap:14px;text-align:center;
+  background:var(--glass);border:1px solid var(--line);border-radius:26px;color:var(--ink);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  padding:24px 18px;margin:0 0 14px;cursor:pointer;font:500 clamp(21px,5.6vw,27px)/1.2 var(--serif);
+  transition:transform .25s,box-shadow .25s;
+}
+.row:active{transform:scale(.98)}
+@media (hover:hover){.row:hover{transform:translateY(-3px);box-shadow:0 12px 30px color-mix(in srgb,var(--rose) 28%,transparent)}}
+.row .ico{font-size:28px}
+.row .go{display:none}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* subpágina */
+.page{
+  position:fixed;inset:0;z-index:10;overflow-y:auto;visibility:hidden;transform:translateY(100%);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),visibility 0s .5s;
+  background:var(--bg1) radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg1) 70%) fixed;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.page.open{visibility:visible;transform:none;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.inner{max-width:620px;margin:0 auto;padding:22px 24px 80px;min-height:100%;text-align:center}
+.back{background:none;border:1.5px solid var(--line);color:var(--ink);font:500 16px var(--sans);padding:10px 18px;border-radius:999px;cursor:pointer}
+.day{margin:18px 0 10px;color:var(--gold);font-family:var(--serif);font-style:italic;font-size:clamp(24px,6.5vw,32px)}
+.page h2{font-size:clamp(36px,10vw,54px);margin-bottom:34px}
+.msg p{margin:0 0 26px;font-family:var(--serif);font-size:clamp(19px,5vw,23px);line-height:1.55}
+.msg p.open1{font-style:italic;color:var(--rose)}
+.msg p.end{color:var(--soft);font-style:italic}
+.msg p{opacity:0;animation:in .9s ease forwards}
+.msg p:nth-child(2){animation-delay:.5s}
+.msg p:nth-child(3){animation-delay:1.1s}
+.msg p:nth-child(4){animation-delay:1.7s}
+.sign{margin-top:30px;color:var(--gold);font-family:var(--serif);font-style:italic;font-size:22px;opacity:0;animation:in .9s 2.3s ease forwards}
+.count{margin-top:48px;font-size:14px;color:var(--soft);border-top:1px solid var(--line);padding-top:16px}
+.heart{display:block;margin:34px auto 0;background:none;border:0;color:var(--rose);font-size:56px;cursor:pointer;padding:0;animation:beat 1.8s ease-in-out infinite}
+.burst{position:fixed;z-index:60;pointer-events:none;font-size:24px;color:var(--rose);animation:burst 1.3s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--x),var(--y)) scale(.4) rotate(var(--r));opacity:0}}
+
+/* fondo vivo */
+#aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#aurora i{position:absolute;border-radius:50%;filter:blur(70px);animation:drift 20s ease-in-out infinite alternate}
+#aurora i:nth-child(1){width:60vmax;height:60vmax;background:var(--rose);left:-22vmax;top:-22vmax;opacity:.3}
+#aurora i:nth-child(2){width:52vmax;height:52vmax;background:var(--gold);right:-24vmax;bottom:-18vmax;opacity:.22;animation-delay:-7s}
+#aurora i:nth-child(3){width:40vmax;height:40vmax;background:#e0457b;left:30%;top:40%;opacity:.16;animation-delay:-12s}
+@keyframes drift{to{transform:translate(9vmax,6vmax) scale(1.18)}}
+#float{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fh{position:absolute;bottom:-40px;color:var(--rose);opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.4}90%{opacity:.25}100%{transform:translateY(-112vh) rotate(28deg);opacity:0}}
+.sp{position:absolute;color:var(--gold);animation:tw 3.2s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:.9;transform:scale(1)}}
+
+/* entrada */
+.pre{opacity:0}
+body.ready .pre{animation:in .9s ease var(--d,0s) forwards}
+body.ready h1.pre{animation:in .9s ease var(--d,0s) forwards,shimmer 9s linear 1.5s infinite}
+@keyframes shimmer{to{background-position:-250% 0}}
+#intro{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;
+  background:var(--bg1) radial-gradient(110% 80% at 50% 30%,var(--bg2),var(--bg1) 75%);
+  transition:opacity .9s ease,transform .9s ease,visibility 0s .9s;
+}
+#intro.out{opacity:0;transform:scale(1.25);visibility:hidden}
+.seal{position:relative;width:132px;height:132px;margin-bottom:26px}
+.seal::before,.seal::after{content:"";pointer-events:none;position:absolute;inset:0;border-radius:50%;border:2px solid var(--rose);animation:ripple 2.8s ease-out infinite}
+.seal::after{animation-delay:1.4s}
+@keyframes ripple{from{transform:scale(1);opacity:.7}to{transform:scale(2.3);opacity:0}}
+#seal{
+  position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;
+  font-size:58px;line-height:1;color:#fff;
+  background:radial-gradient(circle at 32% 28%,#ff8fae,var(--rose) 50%,#9b1c47);
+  box-shadow:0 0 0 8px color-mix(in srgb,var(--rose) 18%,transparent),0 18px 50px color-mix(in srgb,var(--rose) 55%,transparent),inset 0 -6px 14px rgba(0,0,0,.18);
+  animation:beat 1.6s ease-in-out infinite;
+}
+.it{font-family:var(--serif);font-style:italic;font-size:clamp(34px,10vw,48px);line-height:1.1;margin:0}
+.is{margin:0;color:var(--soft);font-size:17px}
+.openbtn{margin-top:30px;font:500 19px var(--sans);color:var(--btn-ink);background:var(--rose);border:0;border-radius:999px;padding:16px 46px;cursor:pointer;box-shadow:0 10px 28px color-mix(in srgb,var(--rose) 50%,transparent);-webkit-tap-highlight-color:transparent}
+.openbtn:active{transform:scale(.96)}
+#intro{cursor:pointer}
+.bigico{font-size:64px;line-height:1;margin-top:34px;filter:drop-shadow(0 0 22px var(--rose));animation:bob 3.5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.petal{position:fixed;top:-30px;z-index:20;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--sx),112vh) rotate(var(--r));opacity:.2}}
+.msg p.end{font-size:clamp(18px,4.6vw,21px)}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .pre{opacity:1}
+  #aurora i{transform:none}
+  .msg p,.sign{opacity:1}
+}
+</style>
+</head>
+<body class="lock">
+<div id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div id="float" aria-hidden="true"></div>
+
+<div id="intro">
+  <div class="seal"><div id="seal" aria-hidden="true">♥</div></div>
+  <p class="it">Tengo algo para ti</p>
+  <p class="is">Es solo para ti</p>
+  <button id="open" class="openbtn">Ábrelo</button>
+</div>
+
+<main class="wrap" id="home">
+  <div class="pulse pre" style="--d:.2s" aria-hidden="true">♥</div>
+  <h1 class="pre" style="--d:.5s">Ábrelo cuando…</h1>
+  <p class="lead pre" style="--d:.9s">Escoge cómo te sientes. Cada día te voy a decir algo diferente.</p>
+  <div id="lista"></div>
+</main>
+
+<div class="page" id="pg" role="dialog" aria-modal="true" aria-labelledby="pgTitle">
+  <div class="inner">
+    <button class="back" id="back" style="display:block;margin-right:auto">← Volver</button>
+    <div class="bigico" id="pgIco" aria-hidden="true"></div>
+    <div class="day" id="pgDay"></div>
+    <h2 id="pgTitle"></h2>
+    <div class="msg" id="pgMsg"></div>
+    <button class="heart" id="heart" aria-label="Mandarte corazones">♥</button>
+    <div class="count" id="pgCount"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var START=new Date(2026,9,8);           /* primer día: 8 oct 2026 */
+  var TOTAL=730;                          /* 2 años de mensajes diarios */
+  var DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  var CLOSE=["Te amo"];
+
+  var C=[
+  {t:"…te sientas triste",e:"🌧️",b:[
+"Amor, no sé exactamente qué te pasó pero me imagino que andas mal y me da pesar. No tienes que explicarme nada si no quieres, eh. Solo quería que supieras que estoy pendiente de ti, aunque sea por acá.",
+"Si tienes ganas de llorar, llora nomás. A mí no me estorba, al revés, prefiero que lo saques a que te lo aguantes sola. Y cuando te sientas un poco mejor me avisas y hablamos de lo que quieras, o de nada.",
+"Ya quisiera estar ahí contigo en este momento para darte un abrazo. Uno de esos largos, que te dejan toda arrugada jaja. Mientras tanto escríbeme o llámame, no importa la hora.",
+"Sé que hoy todo te cae pesado. Pero ya has pasado por días malos y siempre has salido, y yo te he visto. Este también va a pasar, y yo me quedo contigo mientras tanto.",
+"Aunque sea toma un poquito de agua y siéntate un rato sin hacer nada. A mí a veces me sirve eso, sentarme y ya. Y si hoy no sirves para nada, no pasa nada, mañana es otro día.",
+"No tienes que hacerte la fuerte conmigo, ¿ya? Si estás mal, estás mal, y punto. Yo ni me asusto ni me aburro de ti por eso, al contrario, me gusta que me tengas esa confianza.",
+"Acuérdate de todo lo que has aguantado y aquí sigues, así que algo bueno tienes. Yo sé que ahorita no lo ves, pero vas a salir de esto, como siempre. Y yo aquí echándote porras.",
+"Cuéntame qué pasó cuando quieras, yo te escucho sin regañarte ni nada. Y si no quieres hablar, ni modo, me quedo callado a tu lado, que también cuenta. Lo único que no quiero es que lo pases sola."]},
+  {t:"…dudes de ti",e:"🌟",b:[
+"Mira, a veces te exiges más de la cuenta. Yo te veo y me parece que eres muy lista, en serio, y no te lo digo para quedar bien. Ojalá te vieras un día como yo te veo, te llevarías una sorpresa.",
+"Nadie sabe todo desde el principio, ni tú ni yo ni nadie. Tú aprendes rápido, lo he visto. Date tiempo y no te regañes tanto, que no vas tan mal como crees.",
+"Te equivocaste, ¿y qué? A todos nos pasa, a mí me pasa seguido jaja. Lo importante es que lo vuelves a intentar, y eso es lo que me gusta de ti.",
+"Yo veo lo mucho que te esfuerzas, aunque no lo digas. Y me da mucho orgullo, te lo juro. Aunque nadie más lo note, yo sí.",
+"Esa voz en tu cabeza que dice que no puedes ni sabe de lo que habla. Tú ya has hecho cosas que pensabas que no ibas a poder, y las hiciste. Así que a esa voz no le hagas caso.",
+"Si te lo propones, lo logras, esa es mi opinión y no me la cambia nadie. Si te da miedo empezar, empiezas con algo chiquito. Y si necesitas que alguien te empuje un poco, me avisas.",
+"Deja de compararte con los demás, amor, que no hay necesidad. Cada quien va a su paso y tú vas bien. Lo que ves de otras personas es solo una parte, ni sabes cómo están por dentro.",
+"Decidas lo que decidas, yo te apoyo. Y si sale mal, pues lo vemos juntos y ya. Pero yo creo que te va a salir bien, siempre has podido."]},
+  {t:"…me extrañes",e:"💌",b:[
+"Yo también te extraño, no creas que eres la única. Hoy me acordé de ti como tres veces sin querer, viendo cosas que ni al caso. Ya quiero verte.",
+"Cierra los ojos un segundo. En este momento estoy pensando en ti, es en serio. Es mi forma de decirte que aunque no estés cerca, no te me sales de la cabeza.",
+"Que estemos lejos no cambia nada de lo que siento. Sigue igual, o creo que más. Ya falta menos para vernos, aguanta.",
+"Extraño tu risa, tus abrazos, hasta cuando me fastidias jaja. Se siente raro cuando no estás. Quiero que se acabe ya este tiempo sin ti.",
+"Cuando te vea te voy a dar un abrazo que te va a dejar sin aire, ya verás. Lo llevo planeando todo el día. Mientras tanto toma este mensaje como un abrazo adelantado.",
+"Si los abrazos se mandaran por mensaje ya te habría mandado un montón. Como no se puede, te dejo esto. Imagínate que te lo digo bajito al oído.",
+"Cada día que pasa es uno menos para vernos, y yo los voy contando. Se me hace largo, la verdad. Pero va a valer la pena, como siempre que estoy contigo.",
+"Aunque no me veas, yo ando contigo en la cabeza todo el día. Así que si hoy me extrañas, piensa que yo estoy haciendo exactamente lo mismo."]},
+  {t:"…no puedas dormir",e:"🌙",b:[
+"Intenta esto: respira por la nariz contando hasta cuatro y suelta el aire despacio contando hasta seis. Haz eso unas cinco veces. A mí me ayuda cuando me da vueltas la cabeza.",
+"Acomódate bien, agarra tu almohada favorita y haz de cuenta que te estoy abrazando. Sin celular, sin pensar en nada. Solo quédate así un ratito.",
+"Piensa en algo bonito de hoy, aunque sea una tontería, como algo que comiste o algo que te dio risa. Quédate pensando en eso. A mí me funciona más que contar ovejas.",
+"Lo que te tiene preocupada no lo vas a resolver a esta hora, amor. Mañana lo vemos con calma, tú y yo, y seguro no se ve tan feo. Ahorita lo único que toca es descansar.",
+"Imagina que estoy a tu lado, con la mano en tu cabeza, despacito. Y que no hay ruido, nada. Ya solo falta que te dé sueño y te quedes dormida.",
+"Trata de aflojar la cara, los hombros, las manos. Uno a veces duerme todo tieso sin darse cuenta, y así no se descansa. Suelta todo poco a poco.",
+"Por hoy ya hiciste lo que podías, no te exijas más. Lo que quedó pendiente se queda pendiente. Mañana es otro día y ahí lo vemos.",
+"Duerme tranquila que yo estoy pensando en ti. Si te despiertas en la madrugada, acuérdate de que aquí estoy. Todo va a estar bien."]},
+  {t:"…no te sientas bonita",e:"🌹",b:[
+"Si el espejo te hace sentir fea, el espejo está mal y ya. Yo no te veo así ni de lejos. Cada vez que te veo se me ocurre que estás más bonita, y no es exageración.",
+"Me gusta tu cara, tus ojos, tu sonrisa, cómo arrugas la nariz cuando te ríes. Todo de ti me gusta, no cambiaría nada, y te lo digo tal cual.",
+"No es la ropa ni el maquillaje, aunque te queda todo bien. Eres tú, así como eres. A eso me refiero cuando digo que eres bonita.",
+"Lo que más me gusta es verte reír, se te cambia toda la cara. Se me olvida hasta lo que estaba haciendo. Ojalá pudieras verte en ese momento para que me creas.",
+"Desde que te conocí me pareciste preciosa y no se me ha quitado esa idea, al contrario. Y cuando te fui conociendo me di cuenta de que lo de adentro es todavía mejor.",
+"Por fuera estás preciosa, pero lo mejor de ti es cómo eres con la gente, cómo te importan los demás. Eso es lo que más me gusta, y eso no se quita con el tiempo.",
+"Para mí tú siempre vas a ser la más bonita, no hay otra. Pueden pasar mil personas guapas y yo te sigo escogiendo a ti. Así que créemelo de una vez.",
+"Hasta eso que tú crees que son defectos me gusta a mí, la verdad. Son parte de ti y por eso me encantan. Ya no los escondas, que yo no los veo como tú."]},
+  {t:"…estemos peleados",e:"🕊️",b:[
+"Oye, perdóname si te hice sentir mal. A veces me pongo terco o digo cosas sin pensar y después me arrepiento. Quiero hacerlo mejor, porque no me gusta lastimarte.",
+"No quiero ganar esta pelea, quiero que estemos bien y ya. Me importa más eso que tener la razón. Si hay que ceder, cedo yo.",
+"Si sigues enojada, está bien, tómate el tiempo que necesites. No te voy a estar presionando. Cuando quieras hablar, aquí estoy, sin prisa.",
+"Hoy peleamos por algo que en unos días ni vamos a acordarnos, y a mí me da tristeza que nos alejemos por eso. Yo quiero que volvamos a estar como siempre, riéndonos de cualquier cosa.",
+"Cuando quieras lo hablamos con calma. Te prometo escucharte completo, sin interrumpirte ni ponerme a la defensiva. Y después me escuchas tú a mí, sin gritos, solo para arreglarlo.",
+"Me duele estar así contigo, la verdad. Se siente raro todo, hasta el silencio. Extraño tu abrazo, y quiero que ya nos reconciliemos.",
+"Todas las parejas se pelean y no pasa nada, no significa que lo nuestro esté mal. Lo importante es que lo arreglemos, y yo quiero arreglarlo contigo.",
+"Si fui yo el que la regó, lo admito y te pido perdón. Y si no, igual quiero que lo arreglemos, porque no vale la pena que esto se haga más grande. Déjame abrazarte y lo hablamos."]}
+  ];
+
+  function dayIndex(){
+    var n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+    return Math.max(0,Math.round((t-START)/86400000));
+  }
+
+  var home=$('home'),pg=$('pg'),last=null;
+  function open(i,btn){
+    var c=C[i],n=new Date(),di=dayIndex(),wd=n.getDay(),wk=Math.floor(di/7);
+    $('pgDay').textContent=DIAS[wd];
+    $('pgTitle').textContent='Ábrelo cuando '+c.t.replace('…','');
+    var m=$('pgMsg');m.innerHTML='';
+    var parts;
+    if(di>=TOTAL){
+      parts=[["open1","Ya pasaron los dos años de mensajes, amor."],["","Pero lo que siento por ti no se acaba."],["end","Lo que sigue lo escribimos juntos."]];
+      $('pgCount').textContent='Llegamos a los 730 días 💗';
+    }else{
+      parts=[["",c.b[wk%8]],["end",CLOSE[wk%CLOSE.length]]];
+      $('pgCount').textContent='Día '+(di+1)+' de '+TOTAL+' · un mensaje diferente cada día';
+    }
+    parts.forEach(function(p){var e=document.createElement('p');if(p[0])e.className=p[0];e.textContent=p[1];m.appendChild(e)});
+    last=btn;$('pgIco').textContent=c.e;petals();pg.classList.add('open');document.body.classList.add('lock');pg.scrollTop=0;
+    setTimeout(function(){$('back').focus()},520);
+    history.pushState({p:1},'');
+  }
+  function close(fromPop){
+    pg.classList.remove('open');document.body.classList.remove('lock');
+    if(last)last.focus();
+    if(!fromPop&&history.state&&history.state.p)history.back();
+  }
+
+  var L=$('lista');
+  C.forEach(function(c,i){
+    var b=document.createElement('button');b.className='row pre';b.style.setProperty('--d',(1.3+i*.14)+'s');
+    b.innerHTML='<span class="ico" aria-hidden="true"></span><span></span><span class="go" aria-hidden="true">→</span>';
+    b.children[0].textContent=c.e;b.children[1].textContent='Ábrelo cuando '+c.t.replace('…','');
+    b.addEventListener('click',function(){open(i,b)});
+    L.appendChild(b);
+  });
+  $('back').addEventListener('click',function(){close(false)});
+  window.addEventListener('popstate',function(){if(pg.classList.contains('open'))close(true)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&pg.classList.contains('open'))close(false)});
+
+  $('heart').addEventListener('click',function(){
+    var r=this.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    for(var i=0;i<12;i++){
+      var b=document.createElement('span');b.className='burst';b.textContent=['♥','💗','💖'][i%3];
+      b.style.left=cx+'px';b.style.top=cy+'px';
+      var a=Math.random()*Math.PI*2,d=60+Math.random()*120;
+      b.style.setProperty('--x',Math.cos(a)*d+'px');b.style.setProperty('--y',(Math.sin(a)*d-50)+'px');
+      b.style.setProperty('--r',(Math.random()*120-60)+'deg');
+      document.body.appendChild(b);
+      setTimeout(function(el){return function(){el.remove()}}(b),1400);
+    }
+  });
+
+  /* fondo: corazones y destellos */
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fl=$('float');
+  if(!reduce){
+    for(var k=0;k<16;k++){
+      var h=document.createElement('span');h.className='fh';h.textContent='♥';
+      h.style.left=(Math.random()*100)+'%';h.style.fontSize=(14+Math.random()*24)+'px';
+      h.style.animationDuration=(12+Math.random()*14)+'s';h.style.animationDelay=(-Math.random()*20)+'s';
+      fl.appendChild(h);
+    }
+    for(var q=0;q<12;q++){
+      var t=document.createElement('span');t.className='sp';t.textContent='✦';
+      t.style.left=(Math.random()*96)+'%';t.style.top=(Math.random()*96)+'%';
+      t.style.fontSize=(10+Math.random()*14)+'px';t.style.animationDelay=(-Math.random()*3)+'s';
+      t.style.animationDuration=(2.6+Math.random()*2.4)+'s';
+      fl.appendChild(t);
+    }
+  }
+  function burstAt(cx,cy,n){
+    for(var i=0;i<n;i++){
+      var b=document.createElement('span');b.className='burst';b.textContent=['♥','💗','💖','✨'][i%4];
+      b.style.left=cx+'px';b.style.top=cy+'px';
+      var a=Math.random()*Math.PI*2,d=80+Math.random()*190;
+      b.style.setProperty('--x',Math.cos(a)*d+'px');b.style.setProperty('--y',(Math.sin(a)*d-60)+'px');
+      b.style.setProperty('--r',(Math.random()*160-80)+'deg');
+      document.body.appendChild(b);
+      setTimeout(function(el){return function(){el.remove()}}(b),1400);
+    }
+  }
+  function petals(){
+    if(reduce)return;
+    for(var i=0;i<26;i++){
+      var p=document.createElement('span');p.className='petal';
+      p.textContent=['♥','✿','♥','❀'][i%4];
+      p.style.left=(Math.random()*100)+'vw';
+      p.style.color=i%3?'var(--rose)':'var(--gold)';
+      p.style.fontSize=(14+Math.random()*18)+'px';
+      var dur=4.5+Math.random()*3.5;
+      p.style.animationDuration=dur+'s';p.style.animationDelay=(Math.random()*1.4)+'s';
+      p.style.setProperty('--sx',(Math.random()*120-60)+'px');
+      p.style.setProperty('--r',(Math.random()*360-180)+'deg');
+      document.body.appendChild(p);
+      setTimeout(function(el){return function(){el.remove()}}(p),9500);
+    }
+  }
+  /* pantalla de entrada */
+  var intro=$('intro');
+  var opened=false;
+  intro.addEventListener('click',function(){
+    if(opened)return;opened=true;
+    var r=$('seal').getBoundingClientRect();
+    burstAt(r.left+r.width/2,r.top+r.height/2,22);
+    setTimeout(function(){
+      intro.classList.add('out');
+      document.body.classList.add('ready');document.body.classList.remove('lock');
+      setTimeout(function(){intro.remove()},1000);
+    },350);
+  });
+  $('open').focus();
+})();
+</script>
+</body>
+</html>
